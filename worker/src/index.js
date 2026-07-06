@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const mongoose = require("../../packages/database/node_modules/mongoose");
+const mongoose = require("mongoose");
 
 const worker = require("./jobs/processReceiptJob");
 
