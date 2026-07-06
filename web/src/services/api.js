@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: BASE_URL,
   withCredentials: true,
 })
 
@@ -49,15 +51,12 @@ api.interceptors.response.use(
 
       try {
         const refreshResponse = await axios.post(
-          'http://localhost:3000/auth/refresh',
+          `${BASE_URL}/auth/refresh`,
           {},
-          {
-            withCredentials: true,
-          },
+          { withCredentials: true },
         )
 
-        const newAccessToken =
-          refreshResponse.data?.data?.accessToken
+        const newAccessToken = refreshResponse.data?.data?.accessToken
 
         if (!newAccessToken) {
           throw new Error('Refresh não retornou access token')
@@ -73,7 +72,6 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch (refreshError) {
         authStore.logout()
-
         return Promise.reject(refreshError)
       }
     }
