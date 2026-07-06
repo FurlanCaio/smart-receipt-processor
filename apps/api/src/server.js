@@ -19,7 +19,7 @@ connectDB();
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true,
 }));
 app.use(helmet());
@@ -53,8 +53,10 @@ createBullBoard({
 
 app.use("/admin/queues", serverAdapter.getRouter());
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-  console.log("Bull Board:");
-  console.log("http://localhost:3000/admin/queues");
-});
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`)
+  console.log("Bull Board:")
+  console.log(`http://localhost:${PORT}/admin/queues`)
+})
