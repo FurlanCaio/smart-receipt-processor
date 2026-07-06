@@ -1,10 +1,9 @@
 require('dotenv').config()
 const IORedis = require('ioredis')
 
-const connection = new IORedis({
-  host: process.env.REDIS_HOST ?? 'localhost',
-  port: Number(process.env.REDIS_PORT) ?? 6379,
+const connection = new IORedis(process.env.REDIS_URL, {
   maxRetriesPerRequest: null,
+  tls: {}
 })
 
 module.exports = connection
