@@ -1,0 +1,16 @@
+{
+  "name": "smart-receipt-processor",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/api/src",
+    "packages/database",
+    "queue",
+    "shared",
+    "worker"
+  ],
+  "scripts": {
+    "start:api": "node apps/api/src/server.js",
+    "start:worker": "node worker/src/index.js"
+  }
+}
