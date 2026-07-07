@@ -635,10 +635,6 @@ const bulkDeleteModalDescription = computed(() => {
   color: #e2e8f0;
 }
 
-.filter-group-wrapper {
-  margin-left: auto;
-}
-
 @media (max-width: 1024px) {
   .filter-group-wrapper {
     margin-left: 0;
