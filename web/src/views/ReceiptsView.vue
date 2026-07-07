@@ -639,6 +639,7 @@ const bulkDeleteModalDescription = computed(() => {
   font-family: 'DM Sans', sans-serif;
   cursor: pointer;
   transition: background 0.15s;
+  margin-left: auto;
 }
 
 .search-btn:hover {
