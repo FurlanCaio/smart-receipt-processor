@@ -582,8 +582,8 @@ const bulkDeleteModalDescription = computed(() => {
 .filters-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px 12px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
@@ -635,6 +635,11 @@ const bulkDeleteModalDescription = computed(() => {
   color: #e2e8f0;
 }
 
+.filter-group-wrapper {
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+
 @media (max-width: 1024px) {
   .filter-group-wrapper {
     margin-left: 0;
@@ -646,7 +651,7 @@ const bulkDeleteModalDescription = computed(() => {
 .search-wrap {
   position: relative;
   flex: 1;
-  min-width: 200px;
+  min-width: 240px;
   max-width: 300px;
 }
 
@@ -680,7 +685,7 @@ const bulkDeleteModalDescription = computed(() => {
 }
 
 .filter-group {
-  display: flex;
+  display: inline-flex;
   gap: 2px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -736,8 +741,8 @@ const bulkDeleteModalDescription = computed(() => {
   padding: 7px 12px;
   border-radius: 8px;
   cursor: pointer;
-  margin-left: auto;
   white-space: nowrap;
+  margin-left: 0;
 }
 
 .table-card {
