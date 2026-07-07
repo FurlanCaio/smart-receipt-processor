@@ -43,6 +43,10 @@
             </svg>
             Search
           </button>
+          
+            <button class="clear-btn" @click="clearFilters">
+              Clear Filters
+            </button>
         </div>
 
         <div class="filters-row bottom-row">
@@ -70,10 +74,6 @@
               <span>até</span>
               <input type="date" v-model="endDate" />
             </div>
-
-            <button class="clear-btn" @click="clearFilters">
-              Clear Filters
-            </button>
           </div>
         </div>
       </div>
@@ -565,7 +565,6 @@ const bulkDeleteModalDescription = computed(() => {
   background: #1d4ed8;
 }
 
-/* CONTAINER PRINCIPAL DE FILTROS */
 .filters-bar {
   display: flex;
   flex-direction: column;
@@ -574,7 +573,6 @@ const bulkDeleteModalDescription = computed(() => {
   width: 100%;
 }
 
-/* COMPORTAMENTO DAS DUAS LINHAS */
 .filters-row {
   display: flex;
   align-items: center;
@@ -582,10 +580,16 @@ const bulkDeleteModalDescription = computed(() => {
   width: 100%;
 }
 
-/* LINHA SUPERIOR (BUSCA) */
+.top-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-start;
+}
+
 .top-row .search-wrap {
-  flex: 1;
-  max-width: 320px;
+    width: 320px;
+    flex: 0 0 320px;
 }
 
 .search-wrap {
