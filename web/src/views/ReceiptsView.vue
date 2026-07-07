@@ -51,11 +51,11 @@
               <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
               <path d="M20 20l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
-            Pesquisar
+            Search
           </button>
           
           <button class="clear-btn" @click="clearFilters">
-            Limpar
+            Clear Filters
           </button>
         </div>
 
