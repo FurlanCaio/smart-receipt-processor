@@ -63,7 +63,7 @@
         {{ err }}
       </p>
 
-      <p class="copyright">© 2024 Receipt AI. All rights reserved.</p>
+      <p class="copyright">© 2026 Receipt AI. All rights reserved.</p>
     </div>
   </div>
 </template>
