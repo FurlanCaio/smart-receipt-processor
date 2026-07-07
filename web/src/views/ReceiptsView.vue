@@ -565,6 +565,7 @@ const bulkDeleteModalDescription = computed(() => {
   background: #1d4ed8;
 }
 
+/* CONTAINER PRINCIPAL DE FILTROS */
 .filters-bar {
   display: flex;
   flex-direction: column;
@@ -573,6 +574,7 @@ const bulkDeleteModalDescription = computed(() => {
   width: 100%;
 }
 
+/* COMPORTAMENTO DAS DUAS LINHAS */
 .filters-row {
   display: flex;
   align-items: center;
@@ -580,6 +582,7 @@ const bulkDeleteModalDescription = computed(() => {
   width: 100%;
 }
 
+/* LINHA SUPERIOR (BUSCA) */
 .top-row .search-wrap {
   flex: 1;
   max-width: 320px;
@@ -638,6 +641,7 @@ const bulkDeleteModalDescription = computed(() => {
   background: #1d4ed8;
 }
 
+/* LINHA INFERIOR (STATUS TABS + DATA/CLEAR) */
 .bottom-row .filter-group-wrapper {
   margin-left: 0;
 }
@@ -704,6 +708,7 @@ const bulkDeleteModalDescription = computed(() => {
   background: rgba(74, 158, 255, 0.2);
 }
 
+/* AGRUPAMENTO DE DATA + CLEAR FILTERS */
 .bottom-actions-wrap {
   display: flex;
   align-items: center;
@@ -756,6 +761,7 @@ const bulkDeleteModalDescription = computed(() => {
   color: #e2e8f0;
 }
 
+/* TABELA E LAYOUTS ADICIONAIS */
 .table-card {
   background: #0d1628;
   border: 1px solid rgba(255, 255, 255, 0.07);
