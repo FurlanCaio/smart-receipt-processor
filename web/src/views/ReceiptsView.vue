@@ -21,31 +21,21 @@
       </div>
 
       <div class="filters-bar">
-        <div class="search-wrap">
-          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5" />
-            <path d="M20 20l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
-          <input
-            v-model="search"
-            type="text"
-            class="search-input"
-            placeholder="Search receipts..."
-            @keyup.enter="handleSearch"
-          />
-        </div>
+        <div class="filters-row top-row">
+          <div class="search-wrap">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5" />
+              <path d="M20 20l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <input
+              v-model="search"
+              type="text"
+              class="search-input"
+              placeholder="Search receipts..."
+              @keyup.enter="handleSearch"
+            />
+          </div>
 
-        <div class="date-range">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5" />
-            <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
-          <input type="date" v-model="startDate" />
-          <span>até</span>
-          <input type="date" v-model="endDate" />
-        </div>
-
-        <div class="action-filters-group">
           <button class="search-btn" @click="handleSearch">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
               <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
@@ -53,22 +43,36 @@
             </svg>
             Search
           </button>
-          
-          <button class="clear-btn" @click="clearFilters">
-            Clear Filters
-          </button>
         </div>
 
-        <div class="filter-group-wrapper">
-          <div class="filter-group">
-            <button
-              v-for="tab in statusTabs"
-              :key="tab.value"
-              :class="['filter-tab', { active: activeStatus === tab.value }]"
-              @click="activeStatus = tab.value"
-            >
-              {{ tab.label }}
-              <span class="tab-count">{{ tab.count }}</span>
+        <div class="filters-row bottom-row">
+          <div class="filter-group-wrapper">
+            <div class="filter-group">
+              <button
+                v-for="tab in statusTabs"
+                :key="tab.value"
+                :class="['filter-tab', { active: activeStatus === tab.value }]"
+                @click="activeStatus = tab.value"
+              >
+                {{ tab.label }}
+                <span class="tab-count">{{ tab.count }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bottom-actions-wrap">
+            <div class="date-range">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5" />
+                <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+              <input type="date" v-model="startDate" />
+              <span>até</span>
+              <input type="date" v-model="endDate" />
+            </div>
+
+            <button class="clear-btn" @click="clearFilters">
+              Clear Filters
             </button>
           </div>
         </div>
@@ -514,24 +518,6 @@ const bulkDeleteModalDescription = computed(() => {
   padding: 0;
 }
 
-.date-range input {
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 6px;
-  padding: 6px 8px;
-  color: #e2e8f0;
-  font-size: 13px;
-}
-
-.date-range input:focus {
-  border-color: #4a9eff;
-}
-
-.date-range input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  cursor: pointer;
-}
-
 .receipts-page {
   padding: 32px 36px;
   font-family: 'DM Sans', sans-serif;
@@ -581,78 +567,26 @@ const bulkDeleteModalDescription = computed(() => {
 
 .filters-bar {
   display: flex;
-  align-items: center;
-  gap: 16px 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  width: 100%;
 }
 
-.date-range {
-  margin-left: 0;
-}
-
-.action-filters-group {
+.filters-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.search-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.search-btn:hover {
-  background: #1d4ed8;
-}
-
-.clear-btn {
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #7a8baa;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.clear-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: #e2e8f0;
-}
-
-.filter-group-wrapper {
-  flex-basis: 100%;
-  margin-top: 4px;
-}
-
-@media (max-width: 1024px) {
-  .filter-group-wrapper {
-    margin-left: 0;
-    width: 100%;
-    overflow-x: auto;
-  }
+.top-row .search-wrap {
+  flex: 1;
+  max-width: 320px;
 }
 
 .search-wrap {
   position: relative;
-  flex: 1;
-  min-width: 240px;
-  max-width: 300px;
 }
 
 .search-icon {
@@ -684,8 +618,48 @@ const bulkDeleteModalDescription = computed(() => {
   border-color: #4a9eff;
 }
 
+.search-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.search-btn:hover {
+  background: #1d4ed8;
+}
+
+.bottom-row .filter-group-wrapper {
+  margin-left: 0;
+}
+
+@media (max-width: 1024px) {
+  .bottom-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .filter-group-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .bottom-actions-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 .filter-group {
-  display: inline-flex;
+  display: flex;
   gap: 2px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -730,6 +704,12 @@ const bulkDeleteModalDescription = computed(() => {
   background: rgba(74, 158, 255, 0.2);
 }
 
+.bottom-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .date-range {
   display: flex;
   align-items: center;
@@ -742,7 +722,38 @@ const bulkDeleteModalDescription = computed(() => {
   border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
-  margin-left: 0;
+}
+
+.date-range input {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 13px;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.date-range input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.clear-btn {
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #7a8baa;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.clear-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #e2e8f0;
 }
 
 .table-card {
@@ -772,7 +783,6 @@ const bulkDeleteModalDescription = computed(() => {
 .receipts-table th.sortable {
   cursor: pointer;
   user-select: none;
-  display: table-cell;
 }
 
 .receipts-table th.sortable:hover {
@@ -875,9 +885,7 @@ const bulkDeleteModalDescription = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background 0.15s,
-    color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .action-btn:hover {
