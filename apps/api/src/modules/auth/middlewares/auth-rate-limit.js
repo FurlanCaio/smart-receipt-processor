@@ -5,6 +5,9 @@ const authRateLimit = rateLimit({
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    return req.headers['x-forwarded-for']?.split(',')[0] || req.ip
+  },
   message: {
     message: 'Too many requests',
   },
