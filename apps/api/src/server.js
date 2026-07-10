@@ -52,7 +52,26 @@ createBullBoard({
   serverAdapter,
 });
 
-app.use("/admin/queues", serverAdapter.getRouter());
+function bullBoardAuth(req, res, next) {
+  const header = req.headers.authorization || "";
+  const [scheme, encoded] = header.split(" ");
+
+  if (scheme !== "Basic" || !encoded) {
+    res.set("WWW-Authenticate", 'Basic realm="Admin"');
+    return res.status(401).send("Authentication required");
+  }
+
+  const [user, pass] = Buffer.from(encoded, "base64").toString().split(":");
+
+  if (user === process.env.ADMIN_USER && pass === process.env.ADMIN_PASS) {
+    return next();
+  }
+
+  res.set("WWW-Authenticate", 'Basic realm="Admin"');
+  return res.status(401).send("Invalid credentials");
+}
+
+app.use("/admin/queues", bullBoardAuth, serverAdapter.getRouter());
 
 const PORT = process.env.PORT || 3000
 
