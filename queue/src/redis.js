@@ -1,9 +1,21 @@
-require('dotenv').config()
-const IORedis = require('ioredis')
+require("dotenv").config();
+
+const IORedis = require("ioredis");
 
 const connection = new IORedis(process.env.REDIS_URL, {
   maxRetriesPerRequest: null,
-  tls: {}
-})
+});
 
-module.exports = connection
+connection.on("connect", () => {
+  console.log("Redis connected!");
+});
+
+connection.on("ready", () => {
+  console.log("Redis ready!");
+});
+
+connection.on("error", (err) => {
+  console.error("Error Redis:", err);
+});
+
+module.exports = connection;
