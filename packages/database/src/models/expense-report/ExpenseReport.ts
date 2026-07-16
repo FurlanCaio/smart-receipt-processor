@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
+import { Schema, model} from "mongoose";
+import type { ExpenseReportDocument } from "./expense-report-model.ts";
 
-const expenseReportSchema = new mongoose.Schema({
+const expenseReportSchema = new Schema<ExpenseReportDocument>({
   name: {
     type: String,
     required: true,
@@ -31,7 +32,7 @@ const expenseReportSchema = new mongoose.Schema({
     default: null,
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
@@ -42,7 +43,7 @@ const expenseReportSchema = new mongoose.Schema({
   },
   receiptIds: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Receipt",
     },
   ],
@@ -56,6 +57,4 @@ const expenseReportSchema = new mongoose.Schema({
 
 expenseReportSchema.index({ userId: 1, isDeleted: 1, createdAt: -1 });
 
-const ExpenseReport = mongoose.model("ExpenseReport", expenseReportSchema);
-
-module.exports = ExpenseReport;
+export const ExpenseReport = model<ExpenseReportDocument>("ExpenseReport", expenseReportSchema);

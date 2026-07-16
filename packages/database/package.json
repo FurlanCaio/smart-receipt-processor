@@ -9,11 +9,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-   "exports": {
+  "type": "module",
+  "exports": {
     "./*": "./src/*"
   },
   "dependencies": {
+    "@types/mongoose": "^5.11.96",
     "dotenv": "^17.4.2",
     "mongoose": "^9.6.1",
     "zod": "^4.4.3"
