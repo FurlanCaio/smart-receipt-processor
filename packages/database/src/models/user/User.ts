@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
+import {Schema, model} from 'mongoose'
+import type { UserDocument } from './user-model.js'
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema<UserDocument>(
   {
     email: {
       type: String,
@@ -46,7 +47,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: 4,
       maxLength: 15,
-      set: value => value?.replace(/\D/g, ''),
+      set: (value: string) => value?.replace(/\D/g, ''),
       match: /^[0-9]{4,15}$/
     },
 
@@ -78,6 +79,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+export const User = model<UserDocument>('User', userSchema);

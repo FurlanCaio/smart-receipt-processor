@@ -1,8 +1,9 @@
-const mongoose = require("mongoose")
+import {Schema, model} from 'mongoose'
+import type { RefreshTokenDocument } from './refresh-token-model.js'
 
-const refreshTokenSchema = new mongoose.Schema({
+const refreshTokenSchema = new Schema<RefreshTokenDocument>({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
@@ -25,6 +26,4 @@ const refreshTokenSchema = new mongoose.Schema({
     timestamps: true,
 });
 
-const RefreshToken = mongoose.model("RefreshToken", refreshTokenSchema)
-
-module.exports = RefreshToken
+export const RefreshToken = model<RefreshTokenDocument>("RefreshToken", refreshTokenSchema)

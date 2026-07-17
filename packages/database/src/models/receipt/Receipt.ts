@@ -1,12 +1,13 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
+import type {ReceiptItemDocument, ReceiptDocument} from './receipt-model.js';
 
-const receiptItemSchema = new mongoose.Schema({
+const receiptItemSchema = new Schema<ReceiptItemDocument>({
   description: { type: String, trim: true, maxlength: 150 },
   quantity: { type: Number, min: 0, default: 1 },
   unitPrice: { type: Number, min: 0, default: 0 }
 }, { _id: false });
 
-const receiptSchema = new mongoose.Schema({
+const receiptSchema = new Schema<ReceiptDocument>({
   name: { 
     type: String, 
     required: true, 
@@ -14,7 +15,7 @@ const receiptSchema = new mongoose.Schema({
     trim: true,
     maxlength: 100 
   },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   isDeleted: { type: Boolean, default: false, index: true },
   errorMessage: { type: String, trim: true, maxlength: 500, default: null },
   s3Key: { type: String, required: true, trim: true },
@@ -42,15 +43,13 @@ const receiptSchema = new mongoose.Schema({
     items: [receiptItemSchema]
   },
   approvedAt: { type: Date, default: null },
-  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  approvedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   rejectedAt: { type: Date, default: null },
-  rejectedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  rejectedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
 }, { 
   timestamps: true
 });
 
 receiptSchema.index({ userId: 1, isDeleted: 1, status: 1 });
 
-const Receipt = mongoose.model('Receipt', receiptSchema);
-
-module.exports = Receipt;
+export const Receipt = model<ReceiptDocument>('Receipt', receiptSchema);
