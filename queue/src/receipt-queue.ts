@@ -1,5 +1,5 @@
-const { Queue } = require('bullmq')
-const connection = require('../src/redis')
+import { Queue } from 'bullmq'
+import { connection } from './redis.js'
 
 const receiptQueue = new Queue('receipt-queue', {
   connection
@@ -7,4 +7,4 @@ const receiptQueue = new Queue('receipt-queue', {
 
 console.log("Receipt Queue initialized")
 
-module.exports = receiptQueue
+export default receiptQueue

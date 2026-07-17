@@ -1,8 +1,12 @@
-require("dotenv").config();
+import 'dotenv/config';
 
-const IORedis = require("ioredis");
+import {Redis as IORedis} from 'ioredis';
 
-const connection = new IORedis(process.env.REDIS_URL, {
+if(!process.env.REDIS_URL) {
+  throw new Error('REDIS_URL is not defined in environment variables');
+}
+
+export const connection = new IORedis(process.env.REDIS_URL, {
   maxRetriesPerRequest: null,
 });
 
@@ -17,5 +21,3 @@ connection.on("ready", () => {
 connection.on("error", (err) => {
   console.error("Error Redis:", err);
 });
-
-module.exports = connection;
