@@ -1,11 +1,15 @@
-require("dotenv").config();
+import 'dotenv/config';
 
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const worker = require("./jobs/processReceiptJob");
+import { worker } from "./jobs/processReceiptJob.js";
 
 async function main() {
   const mongoUri = process.env.MONGO_URI;
+
+  if(!mongoUri) {
+    throw new Error('MONGO_URI is not defined in environment variables');
+  }
 
   await mongoose.connect(mongoUri);
 }

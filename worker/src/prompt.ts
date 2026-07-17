@@ -1,4 +1,4 @@
-const prompt = `
+export const prompt = `
 Analyze the receipt image and extract the following data. Return ONLY a valid JSON object with no additional text, markdown, or explanation.
 
 The JSON must have exactly these keys at the top level:
@@ -23,5 +23,3 @@ Rules:
 - items must be an array. If no items are found, return an empty array [].
 - Do not include any other keys or explanations outside the JSON.
 `
-
-module.exports = prompt;

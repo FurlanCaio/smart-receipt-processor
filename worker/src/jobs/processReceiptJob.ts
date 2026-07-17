@@ -1,11 +1,14 @@
-require("dotenv").config()
-const connection = require("../../../queue/src/redis")
-const { Worker } = require("bullmq")
-const Receipt = require("../../../packages/database/src/models/Receipt")
-const { analyzeImage } = require("../services/openAiService")
+import 'dotenv/config';
+import { connection } from '../../../queue/src/redis.js'
+import { Worker } from "bullmq"
+import { Receipt } from '../../../packages/database/src/models/receipt/Receipt.js'
+
+//falta refatorar esse arquivo, e corrigir erros no index.ts
+
+import { analyzeImage } from "../services/openAiService.js"
 const { getImageUrl } = require("../utils")
 
-const worker = new Worker("receipt-queue",
+export const worker = new Worker("receipt-queue",
   async job => {
     const { receiptID, userID } = job.data
 
@@ -74,5 +77,3 @@ const worker = new Worker("receipt-queue",
   },
   { connection }
 )
-
-module.exports = worker;

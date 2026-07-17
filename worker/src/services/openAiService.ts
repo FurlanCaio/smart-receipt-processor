@@ -1,8 +1,9 @@
-const { OpenAI } = require("openai");
-const User = require("../../../packages/database/src/models/User");
-const prompt = require("../prompt");
+import { OpenAI } from "openai";
+import type { ChatCompletionCreateParamsNonStreaming } from "openai/resources/chat/completions";
+import { User } from "../../../packages/database/src/models/user/User.js";
+import { prompt } from "../prompt.js";
 
-const MODELS_WITHOUT_TEMPERATURE = new Set([
+const MODELS_WITHOUT_TEMPERATURE: Set<string> = new Set([
   'gpt-5',
   'gpt-5-mini',
   'gpt-5-nano',
@@ -10,7 +11,7 @@ const MODELS_WITHOUT_TEMPERATURE = new Set([
   'o4-mini'
 ]);
 
-async function analyzeImage(imageUrl, userId) {
+export async function analyzeImage(imageUrl: string, userId: string): Promise<string | object | null> {
   try {
     if (!imageUrl || !userId) {
       throw new Error("Both imageUrl and userId are required.");
@@ -20,10 +21,10 @@ async function analyzeImage(imageUrl, userId) {
       .select("openAiPreferenceModel openAiPreferenceTemperature")
       .lean();
 
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const model = user?.openAiPreferenceModel ?? "gpt-4o-mini";
+    const client: OpenAI = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const model: string = user?.openAiPreferenceModel ?? "gpt-4o-mini";
 
-    const payload = {
+    const payload: ChatCompletionCreateParamsNonStreaming = {
       model,
       response_format: { type: "json_object" },
       messages: [
@@ -43,13 +44,15 @@ async function analyzeImage(imageUrl, userId) {
 
     const response = await client.chat.completions.create(payload);
 
-    return response.choices[0].message.content;
+    const firstChoice = response.choices[0];
+
+    if (!firstChoice) {
+      throw new Error("No choices returned from OpenAI API.");
+    }
+
+    return firstChoice.message.content;
   } catch (error) {
     console.error("Error in analyzeImage:", error);
     throw error;
   }
 }
-
-module.exports = {
-  analyzeImage,
-};
