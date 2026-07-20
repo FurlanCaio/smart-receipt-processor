@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { ReceiptStatus, ReceiptExtractedData } from './receipt-types';
+import type { ReceiptStatus, ReceiptExtractedData } from './receipt-types.js';
 
 export interface ReceiptItemDocument {
     description: string;

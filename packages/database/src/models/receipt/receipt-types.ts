@@ -1,4 +1,4 @@
-import { ReceiptItemDocument } from './receipt-model';
+import type { ReceiptItemDocument } from './receipt-model.js';
 
 export type ReceiptStatus = 'pending' | 'processing' | 'needs_approval' | 'approved' | 'rejected' | 'failed';
 

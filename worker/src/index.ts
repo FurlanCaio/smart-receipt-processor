@@ -24,7 +24,7 @@ mongoose.connection.on('error', (err) => {
 
 console.log('Worker: BullMQ worker started, waiting for jobs...')
 
-const shutdown = async (signal) => {
+const shutdown = async (signal: string) => {
   await worker.close();
   await mongoose.connection.close();
   process.exit(0);
