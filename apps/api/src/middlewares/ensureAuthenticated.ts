@@ -1,6 +1,7 @@
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken'
+import express from 'express'
 
-function ensureAuthenticated(req, res, next) {
+export function ensureAuthenticated(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
@@ -45,5 +46,3 @@ function ensureAuthenticated(req, res, next) {
     })
   }
 }
-
-module.exports = { ensureAuthenticated }

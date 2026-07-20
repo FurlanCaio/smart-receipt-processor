@@ -1,7 +1,7 @@
-const { Router } = require('express');
-const authController = require('../controllers/authController');
-const authRateLimit = require('../middlewares/auth-rate-limit');
-const { ensureAuthenticated } = require('../../../middlewares/ensureAuthenticated');
+import { Router } from 'express';
+import { authController } from '../controllers/authController.js';
+import { authRateLimit } from '../middlewares/auth-rate-limit.js';
+import { ensureAuthenticated } from '../../../middlewares/ensureAuthenticated.js';
 
 const authRoutes = Router();
 
@@ -10,4 +10,4 @@ authRoutes.post('/login', authRateLimit, authController.login);
 authRoutes.post('/refresh', authController.refresh);
 authRoutes.post('/logout', ensureAuthenticated, authController.logout);
 
-module.exports = authRoutes;
+export default authRoutes;

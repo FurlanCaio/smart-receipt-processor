@@ -6,7 +6,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "dev": "nodemon ./server.js"
   },
@@ -17,7 +17,7 @@
     "@bull-board/api": "^7.1.5",
     "@bull-board/express": "^7.1.5",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.77.6",
+    "bullmq": "5.77.6",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -32,5 +32,12 @@
     "mongoose": "^9.6.3",
     "multer": "^2.1.1",
     "npm": "^11.15.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^7.0.2"
   }
 }

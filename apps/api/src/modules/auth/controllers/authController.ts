@@ -1,8 +1,8 @@
-const authService = require("../services/authService");
-const { AppError } = require("../../../errors/AppError");
-const handleControllerError = require('../../../middlewares/errorHandler');
+import { authService } from "../services/authService.js";
+import { handleControllerError } from '../../../middlewares/errorHandler.js';
+import type { Request, Response } from 'express';
 
-async function register(req, res) {
+async function register(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
 
@@ -13,11 +13,11 @@ async function register(req, res) {
       data: result,
     });
   } catch (error) {
-    handleControllerError(error, res, 'register');
+    handleControllerError(error, res);
   }
 }
 
-async function login(req, res) {
+async function login(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
 
@@ -39,11 +39,11 @@ async function login(req, res) {
       },
     });
   } catch (error) {
-    handleControllerError(error, res, 'login');
+    handleControllerError(error, res);
   }
 }
 
-async function refresh(req, res) {
+async function refresh(req: Request, res: Response) {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -56,12 +56,19 @@ async function refresh(req, res) {
       },
     });
   } catch (error) {
-    handleControllerError(error, res, 'refresh');
+    handleControllerError(error, res);
   }
 }
 
-async function logout(req, res) {
+async function logout(req: Request, res: Response) {
   try {
+    if (!req.userId) {
+    return res.status(401).json({
+      success: false,
+      message: "User is not authenticated",
+    });
+  }
+
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
@@ -84,13 +91,13 @@ async function logout(req, res) {
       message: "Logout successful",
     });
   } catch (error) {
-    handleControllerError(error, res, 'logout');
+    handleControllerError(error, res);
   }
 }
 
-module.exports = {
+export const authController = {
   register,
   login,
   refresh,
-  logout,
-};
+  logout
+}

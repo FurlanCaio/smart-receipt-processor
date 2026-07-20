@@ -1,24 +1,42 @@
-const User = require("../../../../../../packages/database/src/models/User.js");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const RefreshToken = require("../../../../../../packages/database/src/models/RefreshToken.js");
-const crypto = require("crypto");
-const {
+import { User } from "../../../../../../packages/database/src/models/user/User.js"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import { RefreshToken } from "../../../../../../packages/database/src/models/refresh-token/RefreshToken.js"
+import crypto from "crypto"
+
+import {
   ValidationError,
   AuthenticationError,
   ResourceGoneError,
-  ConfigurationError,
-} = require("../../../errors/AppError.js");
+  ConfigurationError
+} from "../../../errors/AppError.js"
 
-async function registerService({ email, password }) {
+
+interface AuthBody {
+  email: string;
+  password: string;
+}
+
+function isMongoDuplicateError(error: unknown): error is { code: number } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === 11000
+  );
+}
+
+async function registerService({ email, password }: AuthBody) {
   if (!email || !password) {
-    throw new ValidationError("Email and password are required", "MISSING_CREDENTIALS");
+    throw new ValidationError(
+      "Email and password are required",
+      "MISSING_CREDENTIALS",
+    );
   }
   try {
-    
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ email, password: hashedPassword });
-    
+
     await newUser.save();
 
     return {
@@ -26,10 +44,8 @@ async function registerService({ email, password }) {
       userId: newUser._id,
       email: newUser.email,
     };
-
   } catch (error) {
-
-    if (error.code === 11000) {
+    if (isMongoDuplicateError(error)) {
       throw new ValidationError("Email already in use", "EMAIL_ALREADY_EXISTS");
     }
 
@@ -37,41 +53,53 @@ async function registerService({ email, password }) {
   }
 }
 
-async function loginService({ email, password }) {
+async function loginService({ email, password }: AuthBody) {
   if (!email || !password) {
-    throw new ValidationError("Email and password are required", "MISSING_CREDENTIALS");
+    throw new ValidationError(
+      "Email and password are required",
+      "MISSING_CREDENTIALS",
+    );
   }
 
   const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
   const accessSecret = process.env.JWT_SECRET;
 
   if (!refreshSecret || !accessSecret) {
-    throw new ConfigurationError("Token secrets not configured", "MISSING_SECRETS");
+    throw new ConfigurationError(
+      "Token secrets not configured",
+      "MISSING_SECRETS",
+    );
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new AuthenticationError("Invalid email or password", "USER_NOT_FOUND");
+    throw new AuthenticationError(
+      "Invalid email or password",
+      "USER_NOT_FOUND",
+    );
   }
 
   if (user.isDeleted) {
     throw new ResourceGoneError(
       "This account has been deleted. Contact support if this was a mistake.",
-      "ACCOUNT_DELETED"
+      "ACCOUNT_DELETED",
     );
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw new AuthenticationError("Invalid email or password", "INVALID_PASSWORD");
+    throw new AuthenticationError(
+      "Invalid email or password",
+      "INVALID_PASSWORD",
+    );
   }
 
   const refreshToken = jwt.sign(
     { id: user._id, type: "refresh" },
     refreshSecret,
-    { expiresIn: "7d", algorithm: "HS256" }
+    { expiresIn: "7d", algorithm: "HS256" },
   );
 
   const tokenHash = crypto
@@ -92,7 +120,7 @@ async function loginService({ email, password }) {
   return { accessToken, refreshToken };
 }
 
-async function refreshTokenService(token) {
+async function refreshTokenService(token: string) {
   if (!token) {
     throw new ValidationError("Token is required", "MISSING_TOKEN");
   }
@@ -101,7 +129,10 @@ async function refreshTokenService(token) {
   const accessSecret = process.env.JWT_SECRET;
 
   if (!refreshSecret || !accessSecret) {
-    throw new ConfigurationError("Token secrets not configured", "MISSING_SECRETS");
+    throw new ConfigurationError(
+      "Token secrets not configured",
+      "MISSING_SECRETS",
+    );
   }
 
   let decoded;
@@ -119,23 +150,24 @@ async function refreshTokenService(token) {
   const storedToken = await RefreshToken.findOne({ tokenHash });
 
   if (!storedToken) {
-    throw new AuthenticationError("Refresh token not found in database", "TOKEN_NOT_IN_DB");
+    throw new AuthenticationError(
+      "Refresh token not found in database",
+      "TOKEN_NOT_IN_DB",
+    );
   }
 
   if (storedToken.expiresAt < new Date()) {
     throw new AuthenticationError("Refresh token expired", "TOKEN_EXPIRED");
   }
 
-  const accessToken = jwt.sign(
-    { userId: decoded.id },
-    accessSecret,
-    { expiresIn: "1h" }
-  );
+  const accessToken = jwt.sign({ userId: decoded.id }, accessSecret, {
+    expiresIn: "1h",
+  });
 
   return { accessToken };
 }
 
-async function logoutService(token, userId) {
+async function logoutService(token: string, userId: string) {
   if (!token) {
     throw new ValidationError("Token is required", "MISSING_TOKEN");
   }
@@ -147,7 +179,10 @@ async function logoutService(token, userId) {
   const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
 
   if (!refreshSecret) {
-    throw new ConfigurationError("Token secrets not configured", "MISSING_SECRETS");
+    throw new ConfigurationError(
+      "Token secrets not configured",
+      "MISSING_SECRETS",
+    );
   }
 
   const tokenHash = crypto
@@ -160,7 +195,7 @@ async function logoutService(token, userId) {
   return { message: "Logout successful" };
 }
 
-module.exports = {
+export const authService = {
   registerService,
   loginService,
   refreshTokenService,

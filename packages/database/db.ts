@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 const mongoURI: string | undefined = process.env.MONGO_URI;
 
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
     mongoose.set('bufferCommands', false);
 
@@ -21,5 +21,3 @@ const connectDB = async () => {
     process.exit(1);
   }
 };
-
-module.exports = connectDB;

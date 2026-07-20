@@ -1,6 +1,6 @@
 const { AppError }= require('../errors/AppError');
 
-function handleControllerError(error, res) {
+export function handleControllerError(error, res) {
   if (error.name === 'ValidationError' && error.errors) {
     const messages = Object.values(error.errors).map(err => err.message);
     return res.status(400).json({
@@ -25,5 +25,3 @@ function handleControllerError(error, res) {
     code: 'INTERNAL_SERVER_ERROR'
   });
 }
-
-module.exports = handleControllerError;

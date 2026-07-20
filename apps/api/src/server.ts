@@ -1,17 +1,16 @@
-const dotenv = require('dotenv');
-dotenv.config();
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const connectDB = require("../../../packages/database/db")
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { connectDB } from "../../../packages/database/db.js";
 
-const authRoutes = require('./modules/auth/routes/authRoutes');
-const usersRoutes = require('./modules/users/routes/usersRoutes');
-const receiptsRoutes = require('./modules/receipts/routes/receiptsRoutes');
-const expenseReportRoutes = require('./modules/expenseReports/routes/expenseReportRoutes');
-const receiptQueue = require("../../../queue/src/receipt-queue")
+import authRoutes from './modules/auth/routes/authRoutes.js';
+import usersRoutes from './modules/users/routes/usersRoutes.js';
+import receiptsRoutes from './modules/receipts/routes/receiptsRoutes.js';
+import expenseReportRoutes from './modules/expenseReports/routes/expenseReportRoutes.js';
+import receiptQueue from "../../../queue/src/receipt-queue.js";
 
-const cookieParser = require("cookie-parser")
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -35,13 +34,13 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.use((err, req, res, next) => {
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-const { createBullBoard } = require("@bull-board/api");
-const { BullMQAdapter } = require("@bull-board/api/bullMQAdapter");
-const { ExpressAdapter } = require("@bull-board/express");
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { ExpressAdapter } from "@bull-board/express";
 
 const serverAdapter = new ExpressAdapter();
 
@@ -52,7 +51,7 @@ createBullBoard({
   serverAdapter,
 });
 
-function bullBoardAuth(req, res, next) {
+function bullBoardAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
   const header = req.headers.authorization || "";
   const [scheme, encoded] = header.split(" ");
 
