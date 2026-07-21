@@ -1,11 +1,17 @@
-const mongoose = require("mongoose");
-const Receipt = require("../../../../../packages/database/src/models/Receipt");
+import mongoose from "mongoose";
+import { Receipt } from "../../../../../packages/database/src/models/receipt/Receipt.js";
 
-async function getDashboardQuery(userId) {
+interface DashboardAggregation {
+  stats: Array<{ total: number; pending: number; processing: number; completed: number }>;
+  graphData: Array<{ _id: string; uploads: number }>;
+  recentReceipts: Array<Record<string, unknown>>;
+}
+
+export async function getDashboardQuery(userId: string) {
 
   const thirtyDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
 
-  const result = await Receipt.aggregate([
+  const result = await Receipt.aggregate<DashboardAggregation>([
     {
       $match: {
         userId: new mongoose.Types.ObjectId(userId),
@@ -107,6 +113,14 @@ async function getDashboardQuery(userId) {
 
   const data = result[0];
 
+  if (!data) {
+    return {
+      stats: { total: 0, pending: 0, processing: 0, completed: 0 },
+      graphData: [],
+      recentReceipts: [],
+    };
+  }
+
   return {
     stats: data.stats[0] || {
       total: 0,
@@ -121,6 +135,3 @@ async function getDashboardQuery(userId) {
   };
 }
 
-module.exports = {
-  getDashboardQuery,
-};

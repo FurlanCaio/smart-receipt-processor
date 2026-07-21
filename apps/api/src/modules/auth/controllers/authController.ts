@@ -1,8 +1,12 @@
 import { authService } from "../services/authService.js";
+import type { AuthBody } from "../services/authService.js";
 import { handleControllerError } from '../../../middlewares/errorHandler.js';
 import type { Request, Response } from 'express';
 
-async function register(req: Request, res: Response) {
+async function register(
+  req: Request<Record<string, never>, unknown, AuthBody>,
+  res: Response,
+) {
   try {
     const { email, password } = req.body;
 
@@ -17,7 +21,10 @@ async function register(req: Request, res: Response) {
   }
 }
 
-async function login(req: Request, res: Response) {
+async function login(
+  req: Request<Record<string, never>, unknown, AuthBody>,
+  res: Response,
+) {
   try {
     const { email, password } = req.body;
 

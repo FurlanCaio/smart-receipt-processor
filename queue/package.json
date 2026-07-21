@@ -16,7 +16,7 @@
     "ioredis": "^5.10.1"
   },
   "devDependencies": {
-    "@types/node": "^14.18.63",
+    "@types/node": "^20.0.0",
     "typescript": "^7.0.2"
   }
 }

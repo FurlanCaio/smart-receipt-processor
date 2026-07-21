@@ -1,14 +1,38 @@
-require("dotenv").config();
-const User = require("../../../../../../packages/database/src/models/User.js");
-const Receipt = require("../../../../../../packages/database/src/models/Receipt.js");
-const RefreshToken = require("../../../../../../packages/database/src/models/RefreshToken.js");
-const { encrypt, getImageUrl } = require("../utils.js");
-const crypto = require("crypto");
-const bcrypt = require("bcrypt");
-const { uploadFile } = require("../providers/s3/upload-file");
-const { AppError } = require("../../../errors/AppError.js"); 
+import "dotenv/config";
+import { User } from "../../../../../../packages/database/src/models/user/User.js";
+import type { UserDocument } from "../../../../../../packages/database/src/models/user/user-model.js";
+import { Receipt } from "../../../../../../packages/database/src/models/receipt/Receipt.js";
+import { RefreshToken } from "../../../../../../packages/database/src/models/refresh-token/RefreshToken.js";
+import { encrypt, getImageUrl } from "../utils.js";
+import crypto from "crypto";
+import bcrypt from "bcrypt";
+import { uploadFile } from "../providers/s3/upload-file.js";
+import { AppError } from "../../../errors/AppError.js";
 
-async function getProfileService(userId) {
+export interface UpdateProfileInput {
+  name?: string;
+  phoneNumber?: string;
+  company?: string;
+}
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ApiKeyInput {
+  apiKey: string;
+}
+
+export interface UpdatePreferencesInput {
+  openAiPreferenceModel: string;
+  openAiPreferenceTemperature: number;
+}
+
+type UserProfileUpdate = Partial<Pick<UserDocument, "name" | "phoneNumber" | "company">>;
+
+async function getProfileService(userId: string) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
   }
@@ -35,12 +59,15 @@ async function getProfileService(userId) {
   };
 }
 
-async function updateProfileService(userId, { name, phoneNumber, company }) {
+async function updateProfileService(
+  userId: string,
+  { name, phoneNumber, company }: UpdateProfileInput,
+) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
   }
 
-  const updateData = {
+  const updateData: UserProfileUpdate = {
     ...(name !== undefined && { name: name === "" ? null : name }),
     ...(company !== undefined && { company: company === "" ? null : company }),
   };
@@ -74,10 +101,10 @@ async function updateProfileService(userId, { name, phoneNumber, company }) {
 }
 
 async function changePasswordService(
-  userId,
-  currentPassword,
-  newPassword,
-  confirmNewPassword,
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+  confirmNewPassword: string,
 ) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
@@ -121,7 +148,7 @@ async function changePasswordService(
   return { message: "Password changed successfully" };
 }
 
-async function deleteAccountService(userId) {
+async function deleteAccountService(userId: string) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
   }
@@ -154,16 +181,21 @@ async function deleteAccountService(userId) {
   };
 }
 
-async function insertApiKeyService({ userId, apiKey }) {
+async function insertApiKeyService({ userId, apiKey }: ApiKeyInput & { userId: string }) {
   if (!userId) {
     throw new AppError("UserId is required", 400, "VALIDATION_ERROR");
   }
 
   const iv = crypto.randomBytes(16);
+  const encryptionKey = process.env.API_KEY_ENCRYPTION_KEY;
+  if (!encryptionKey) {
+    throw new AppError("API key encryption is not configured", 500, "MISSING_ENCRYPTION_KEY");
+  }
+
   const encryptedApiKey = encrypt(
     apiKey,
-    process.env.API_KEY_ENCRYPTION_KEY,
-    iv,
+    encryptionKey,
+    iv.toString("hex"),
   );
 
   const user = await User.findOneAndUpdate(
@@ -192,7 +224,7 @@ async function insertApiKeyService({ userId, apiKey }) {
   };
 }
 
-async function uploadFileService(file, userId) {
+async function uploadFileService(file: Express.Multer.File, userId: string) {
   const { originalname, buffer, mimetype } = file;
 
   const uploadResult = await uploadFile({
@@ -229,7 +261,7 @@ async function uploadFileService(file, userId) {
   return { profilePictureUrl };
 }
 
-async function deleteAvatarService(userId) {
+async function deleteAvatarService(userId: string) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
   }
@@ -250,9 +282,9 @@ async function deleteAvatarService(userId) {
 }
 
 async function updatePreferencesService(
-  userId,
-  openAiPreferenceModel,
-  openAiPreferenceTemperature,
+  userId: string,
+  openAiPreferenceModel: string,
+  openAiPreferenceTemperature: number,
 ) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
@@ -285,7 +317,7 @@ async function updatePreferencesService(
   };
 }
 
-async function getPreferencesService(userId) {
+async function getPreferencesService(userId: string) {
   if (!userId) {
     throw new AppError("User ID is required", 400, "VALIDATION_ERROR");
   }
@@ -305,7 +337,7 @@ async function getPreferencesService(userId) {
   };
 }
 
-module.exports = {
+export default {
   insertApiKeyService,
   uploadFileService,
   getProfileService,

@@ -1,8 +1,12 @@
-const { AppError }= require('../errors/AppError');
+import mongoose from "mongoose"
+import type { Response } from "express"
+import { AppError } from "../errors/AppError.js"
 
-export function handleControllerError(error, res) {
-  if (error.name === 'ValidationError' && error.errors) {
-    const messages = Object.values(error.errors).map(err => err.message);
+export function handleControllerError(error: unknown, res: Response) {
+  if (error instanceof mongoose.Error.ValidationError) {
+    const messages = Object.values(error.errors).map(
+      validationError => validationError.message
+    );
     return res.status(400).json({
       success: false,
       message: 'Validation error in the provided data.',
@@ -19,9 +23,13 @@ export function handleControllerError(error, res) {
     });
   }
 
+  const message = error instanceof Error
+    ? error.message
+    : 'Internal Server Error'
+
   return res.status(500).json({ 
     success: false, 
-    message: error.message || 'Internal Server Error',
+    message,
     code: 'INTERNAL_SERVER_ERROR'
   });
 }

@@ -1,13 +1,37 @@
-const mongoose = require("mongoose");
-const ExpenseReport = require("../../../../../../packages/database/src/models/ExpenseReport");
-const Receipt = require("../../../../../../packages/database/src/models/Receipt");
-const {
+import mongoose, { Types } from "mongoose";
+import ExcelJS from "exceljs";
+import { ExpenseReport } from "../../../../../../packages/database/src/models/expense-report/ExpenseReport.js";
+import type { ExpenseReportDocument } from "../../../../../../packages/database/src/models/expense-report/expense-report-model.js";
+import { Receipt } from "../../../../../../packages/database/src/models/receipt/Receipt.js";
+import {
   AuthenticationError,
   ValidationError,
   NotFoundError,
-} = require("../../../errors/AppError");
+} from "../../../errors/AppError.js";
 
-async function getExpenseReports(userId) {
+export interface CreateExpenseReportInput {
+  name: unknown;
+  description?: unknown;
+  month?: unknown;
+  project?: unknown;
+  client?: unknown;
+  receiptId?: unknown;
+}
+
+export interface UpdateExpenseReportInput {
+  name?: unknown;
+  description?: unknown;
+  month?: unknown;
+  project?: unknown;
+  client?: unknown;
+  status?: unknown;
+}
+
+type ExpenseReportUpdate = Partial<
+  Pick<ExpenseReportDocument, "name" | "description" | "month" | "project" | "client" | "status">
+> & { updatedAt: Date };
+
+async function getExpenseReports(userId: string) {
   if (!userId) throw new AuthenticationError("Invalid user", "INVALID_USER");
 
   const reports = await ExpenseReport.find({ userId, isDeleted: false })
@@ -31,7 +55,7 @@ async function getExpenseReports(userId) {
   return enriched;
 }
 
-async function getExpenseReportById(reportId, userId) {
+async function getExpenseReportById(reportId: string, userId: string) {
   if (!reportId)
     throw new ValidationError("Report ID is required", "INVALID_REPORT");
   if (!userId) throw new AuthenticationError("Invalid user", "INVALID_USER");
@@ -58,8 +82,8 @@ async function getExpenseReportById(reportId, userId) {
 }
 
 async function createExpenseReport(
-  userId,
-  { name, description, month, project, client, receiptId },
+  userId: string,
+  { name, description, month, project, client, receiptId }: CreateExpenseReportInput,
 ) {
   if (!userId) throw new AuthenticationError("Invalid user", "INVALID_USER");
 
@@ -88,7 +112,7 @@ async function createExpenseReport(
     }
   }
 
-  const receiptIds = [];
+  const receiptIds: Types.ObjectId[] = [];
   if (receiptId) {
     const receipt = await Receipt.findOne({
       _id: receiptId,
@@ -120,7 +144,7 @@ async function createExpenseReport(
   return report;
 }
 
-async function addReceiptToReport(reportId, receiptId, userId) {
+async function addReceiptToReport(reportId: string, receiptId: string, userId: string) {
   if (!reportId)
     throw new ValidationError("Report ID is required", "INVALID_REPORT");
   if (!receiptId)
@@ -174,7 +198,7 @@ async function addReceiptToReport(reportId, receiptId, userId) {
   return updated;
 }
 
-async function removeReceiptFromReport(reportId, receiptId, userId) {
+async function removeReceiptFromReport(reportId: string, receiptId: string, userId: string) {
   if (!reportId)
     throw new ValidationError("Report ID is required", "INVALID_REPORT");
   if (!receiptId)
@@ -209,9 +233,9 @@ async function removeReceiptFromReport(reportId, receiptId, userId) {
 }
 
 async function updateExpenseReport(
-  reportId,
-  userId,
-  { name, description, month, project, client, status },
+  reportId: string,
+  userId: string,
+  { name, description, month, project, client, status }: UpdateExpenseReportInput,
 ) {
   if (!reportId)
     throw new ValidationError("Report ID is required", "INVALID_REPORT");
@@ -232,7 +256,7 @@ async function updateExpenseReport(
     );
   }
 
-  const updateData = { updatedAt: new Date() };
+  const updateData: ExpenseReportUpdate = { updatedAt: new Date() };
 
   if (name !== undefined)
     updateData.name = String(name).trim().substring(0, 200);
@@ -263,7 +287,7 @@ async function updateExpenseReport(
   }
 
   if (status !== undefined) {
-    if (!["draft", "completed"].includes(status)) {
+    if (status !== "draft" && status !== "completed") {
       throw new ValidationError("Invalid status", "INVALID_STATUS");
     }
     updateData.status = status;
@@ -278,7 +302,7 @@ async function updateExpenseReport(
   return updated;
 }
 
-async function deleteExpenseReport(reportId, userId) {
+async function deleteExpenseReport(reportId: string, userId: string) {
   if (!reportId)
     throw new ValidationError("Report ID is required", "INVALID_REPORT");
   if (!userId) throw new AuthenticationError("Invalid user", "INVALID_USER");
@@ -293,7 +317,7 @@ async function deleteExpenseReport(reportId, userId) {
     throw new NotFoundError("Expense report not found", "REPORT_NOT_FOUND");
 }
 
-async function exportExpenseReportXlsx(reportId, userId) {
+async function exportExpenseReportXlsx(reportId: string, userId: string) {
   if (!reportId)
     throw new ValidationError("Report ID is required", "INVALID_REPORT");
   if (!userId) throw new AuthenticationError("Invalid user", "INVALID_USER");
@@ -311,17 +335,19 @@ async function exportExpenseReportXlsx(reportId, userId) {
     isDeleted: false,
   }).lean();
 
-  const ExcelJS = require("exceljs");
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Expense Report");
 
-  const headerFill = {
+  const headerFill: ExcelJS.FillPattern = {
     type: "pattern",
     pattern: "solid",
     fgColor: { argb: "FF1E3A6E" },
   };
   const headerFont = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
-  const headerAlignment = { vertical: "middle", horizontal: "center" };
+  const headerAlignment: Partial<ExcelJS.Alignment> = {
+    vertical: "middle",
+    horizontal: "center",
+  };
 
   sheet.columns = [
     { header: "Date", key: "date", width: 16 },
@@ -363,7 +389,7 @@ async function exportExpenseReportXlsx(reportId, userId) {
   return { workbook, reportName: report.name };
 }
 
-async function getApprovedReceipts(userId) {
+async function getApprovedReceipts(userId: string) {
   if (!userId) throw new AuthenticationError("Invalid user", "INVALID_USER");
 
   const receipts = await Receipt.find({
@@ -377,7 +403,7 @@ async function getApprovedReceipts(userId) {
   return receipts;
 }
 
-module.exports = {
+export default {
   getExpenseReports,
   getExpenseReportById,
   createExpenseReport,

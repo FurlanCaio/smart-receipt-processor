@@ -1,18 +1,17 @@
-import { User } from "../../../../../../packages/database/src/models/user/User.js"
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
-import { RefreshToken } from "../../../../../../packages/database/src/models/refresh-token/RefreshToken.js"
-import crypto from "crypto"
+import { User } from "../../../../../../packages/database/src/models/user/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { RefreshToken } from "../../../../../../packages/database/src/models/refresh-token/RefreshToken.js";
+import crypto from "crypto";
 
 import {
   ValidationError,
   AuthenticationError,
   ResourceGoneError,
-  ConfigurationError
-} from "../../../errors/AppError.js"
+  ConfigurationError,
+} from "../../../errors/AppError.js";
 
-
-interface AuthBody {
+export interface AuthBody {
   email: string;
   password: string;
 }
@@ -158,6 +157,17 @@ async function refreshTokenService(token: string) {
 
   if (storedToken.expiresAt < new Date()) {
     throw new AuthenticationError("Refresh token expired", "TOKEN_EXPIRED");
+  }
+
+  if (
+    typeof decoded === "string" ||
+    typeof decoded.id !== "string" ||
+    decoded.type !== "refresh"
+  ) {
+    throw new AuthenticationError(
+      "Invalid refresh token payload",
+      "INVALID_TOKEN_PAYLOAD",
+    );
   }
 
   const accessToken = jwt.sign({ userId: decoded.id }, accessSecret, {

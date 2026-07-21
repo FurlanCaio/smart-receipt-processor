@@ -15,12 +15,11 @@
   },
   "dependencies": {
     "dotenv": "^17.4.2",
-    "mongoose": "^9.6.1",
+    "mongoose": "9.7.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/mongoose": "^5.11.96",
-    "@types/node": "^14.18.63",
+    "@types/node": "^20.0.0",
     "typescript": "^7.0.2"
   }
 }

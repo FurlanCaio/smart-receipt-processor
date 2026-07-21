@@ -19,4 +19,6 @@ export interface ReceiptDocument {
     approvedBy: Types.ObjectId | null;
     rejectedAt: Date | null;
     rejectedBy: Types.ObjectId | null;
+    createdAt: Date;
+    updatedAt: Date;
 }

@@ -1,6 +1,6 @@
-const receiptQueue = require('../../../../../../queue/src/receipt-queue')
+import receiptQueue from '../../../../../../queue/src/receipt-queue.js'
 
-async function sendReceiptJob(receiptID, userID) {
+export async function sendReceiptJob(receiptID: string, userID: string) {
   await receiptQueue.add('send-receipt', {
     receiptID,
     userID
@@ -13,6 +13,3 @@ async function sendReceiptJob(receiptID, userID) {
   })
 }
 
-module.exports = {
-  sendReceiptJob
-}

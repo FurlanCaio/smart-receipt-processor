@@ -3,7 +3,10 @@
  * Allows returning appropriate HTTP status codes.
  */
 class AppError extends Error {
-  constructor(message, statusCode = 500, code = null) {
+  statusCode: number;
+  code: string | null;
+
+  constructor(message: string, statusCode = 500, code: string | null = null) {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
@@ -16,7 +19,7 @@ class AppError extends Error {
  * Used when input data is invalid.
  */
 class ValidationError extends AppError {
-  constructor(message, code = 'VALIDATION_ERROR') {
+  constructor(message: string, code = 'VALIDATION_ERROR') {
     super(message, 400, code);
     this.name = 'ValidationError';
   }
@@ -27,7 +30,7 @@ class ValidationError extends AppError {
  * Used when credentials are invalid.
  */
 class AuthenticationError extends AppError {
-  constructor(message, code = 'AUTHENTICATION_ERROR') {
+  constructor(message: string, code = 'AUTHENTICATION_ERROR') {
     super(message, 401, code);
     this.name = 'AuthenticationError';
   }
@@ -38,7 +41,7 @@ class AuthenticationError extends AppError {
  * Used when the user does not have permission.
  */
 class AuthorizationError extends AppError {
-  constructor(message, code = 'AUTHORIZATION_ERROR') {
+  constructor(message: string, code = 'AUTHORIZATION_ERROR') {
     super(message, 403, code);
     this.name = 'AuthorizationError';
   }
@@ -48,7 +51,7 @@ class AuthorizationError extends AppError {
  * Resource not found error (404 Not Found).
  */
 class NotFoundError extends AppError {
-  constructor(message, code = 'NOT_FOUND') {
+  constructor(message: string, code = 'NOT_FOUND') {
     super(message, 404, code);
     this.name = 'NotFoundError';
   }
@@ -59,7 +62,7 @@ class NotFoundError extends AppError {
  * Used when an account or resource has been permanently deleted.
  */
 class ResourceGoneError extends AppError {
-  constructor(message, code = 'RESOURCE_DELETED') {
+  constructor(message: string, code = 'RESOURCE_DELETED') {
     super(message, 410, code);
     this.name = 'ResourceGoneError';
   }
@@ -70,7 +73,7 @@ class ResourceGoneError extends AppError {
  * Used when environment variables or configuration are missing.
  */
 class ConfigurationError extends AppError {
-  constructor(message, code = 'CONFIGURATION_ERROR') {
+  constructor(message: string, code = 'CONFIGURATION_ERROR') {
     super(message, 500, code);
     this.name = 'ConfigurationError';
   }

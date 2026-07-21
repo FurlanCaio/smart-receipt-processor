@@ -5,7 +5,7 @@ export type ReceiptStatus = 'pending' | 'processing' | 'needs_approval' | 'appro
 export interface ReceiptExtractedData {
     sellerName: string | null;
     totalAmount: number | null;
-    date: Date | null;
+    date: string | null;
     category: string | null;
     taxAmount: number | null;
     currency: ReceiptCurrency | null;

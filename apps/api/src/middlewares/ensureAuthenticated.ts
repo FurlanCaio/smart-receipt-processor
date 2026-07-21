@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken'
-import express from 'express'
+import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
+import type { NextFunction, Request, Response } from 'express'
 
-export function ensureAuthenticated(req: express.Request, res: express.Response, next: express.NextFunction) {
+export function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization
 
   if (!authHeader) {
@@ -15,15 +15,21 @@ export function ensureAuthenticated(req: express.Request, res: express.Response,
   const token = authHeader.replace('Bearer ', '')
 
   try {
+    if(!process.env.JWT_SECRET) {
+      throw new Error('JWT is not defined in environment variables');
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+    if (typeof decoded === 'string' || typeof decoded.userId !== 'string') {
+      throw new JsonWebTokenError('Invalid token payload')
+    }
 
     req.userId = decoded.userId
 
-
-
     next()
   } catch (error) {
-    if (error.name === 'TokenExpiredError') {
+    if (error instanceof TokenExpiredError) {
       return res.status(401).json({
         success: false,
         code: 'TOKEN_EXPIRED',
@@ -31,7 +37,7 @@ export function ensureAuthenticated(req: express.Request, res: express.Response,
       })
     }
 
-    if (error.name === 'JsonWebTokenError') {
+    if (error instanceof JsonWebTokenError) {
       return res.status(401).json({
         success: false,
         code: 'INVALID_TOKEN',
