@@ -1,5 +1,7 @@
-import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import type { NextFunction, Request, Response } from 'express'
+import jwt from "jsonwebtoken";
+
+const { JsonWebTokenError, TokenExpiredError, verify } = jwt;
 
 export function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization
@@ -15,7 +17,7 @@ export function ensureAuthenticated(req: Request, res: Response, next: NextFunct
   const token = authHeader.replace('Bearer ', '')
 
   try {
-    if(!process.env.JWT_SECRET) {
+    if (!process.env.JWT_SECRET) {
       throw new Error('JWT is not defined in environment variables');
     }
 
