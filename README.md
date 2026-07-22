@@ -74,15 +74,16 @@ Uploading directly to S3 eliminates file streaming through the backend, reducing
 
 | Layer | Technology |
 |---|---|
-| Backend API | Node.js, Express |
-| Frontend | Vue 3, Vite, Pinia, Tailwind CSS |
+| Backend API | Node.js, Express, TypeScript |
+| Worker | Node.js, BullMQ, TypeScript |
+| Frontend | Vue 3, Vite, Pinia, Tailwind CSS (JavaScript) |
 | Database | MongoDB, Mongoose |
 | Queue | BullMQ, Redis |
 | Storage | AWS S3 |
 | AI | OpenAI (GPT-4o-mini by default) |
 | Auth | JWT, bcrypt, HMAC-SHA256 |
 | Encryption | AES-256-CBC (API key storage) |
-| Monorepo | npm workspaces |
+| Monorepo | npm workspaces, shared `tsc` build via `tsconfig.build.json` |
 
 ---
 
@@ -91,21 +92,24 @@ Uploading directly to S3 eliminates file streaming through the backend, reducing
 ```
 smart-receipt-processor/
 ├── apps/
-│   └── api/                    # Express REST API
+│   └── api/                    # Express REST API (TypeScript)
 │       └── src/
 │           ├── errors/         # Custom error class hierarchy
 │           ├── middlewares/    # Auth, error handler, rate limit
+│           ├── types/          # Ambient/express type augmentations
 │           └── modules/
 │               ├── auth/       # Register, login, refresh, logout
 │               ├── receipts/   # Upload, process, approve, reject
 │               ├── expenseReports/  # Report management + XLSX export
 │               └── users/      # Profile, avatar, preferences, password
 ├── packages/
-│   └── database/               # Mongoose models + DB connection (shared)
-├── queue/                      # BullMQ queue definition + Redis connection
-├── shared/                     # AWS S3 client (shared)
-├── web/                        # Vue 3 frontend
-└── worker/                     # BullMQ worker + OpenAI integration
+│   └── database/               # Mongoose models + DB connection (shared, TypeScript)
+├── queue/                      # BullMQ queue definition + Redis connection (TypeScript)
+├── shared/                     # AWS S3 client (shared, TypeScript)
+├── web/                        # Vue 3 frontend (JavaScript)
+├── worker/                     # BullMQ worker + OpenAI integration (TypeScript)
+├── tsconfig.build.json          # Root TS project: compiles api, worker, queue, shared, database into /dist
+└── dist/                        # Compiled output (git-ignored), consumed by npm start / start:worker
 ```
 
 ---
@@ -175,18 +179,31 @@ npm install
 
 ### Running the services
 
-```bash
-# Start the API
-cd apps/api/src
-node server.js
+**Development** (uses `tsx watch`, no build step needed):
 
-# Start the Worker (separate terminal)
-cd worker
-node src/index.js
+```bash
+# Start the API (from repo root)
+npm run dev:api
+
+# Start the Worker (separate terminal, from repo root)
+npm run dev:worker
 
 # Start the Frontend (separate terminal)
 cd web
 npm run dev
+```
+
+**Production** (compiles TypeScript first via the root `tsc` project):
+
+```bash
+# Build all backend packages (api, worker, queue, shared, database) into /dist
+npm run build
+
+# Start the API
+npm run start:api
+
+# Start the Worker (separate process/service)
+npm run start:worker
 ```
 
 ---
@@ -302,30 +319,31 @@ The project has zero automated tests. Priority additions for v2:
 **`usersService` uses generic Error throws**
 Unlike `receiptService` and `authService`, `usersService` throws generic `Error` instead of the custom error class hierarchy. The `usersController` compensates with string-matching fallbacks. This should be refactored to use `NotFoundError`, `ValidationError`, etc. consistently.
 
-**Hardcoded mongoose path in worker**
-`worker/src/index.js` imports mongoose via a direct path to `packages/database/node_modules/mongoose` to ensure a single shared instance. This is a monorepo dependency isolation issue that should be resolved with proper workspace hoisting or a shared database connection export.
-
-**No TypeScript**
-The codebase is plain JavaScript. Migrating to TypeScript would improve type safety, IDE support, and catch a class of bugs at compile time.
-
 **No path aliases**
-Relative imports like `../../../errors/AppError` are verbose and fragile. Adding `tsconfig` or `jsconfig` path aliases (e.g. `@errors/AppError`) would improve readability and refactoring.
+Relative imports like `../../../errors/AppError` are verbose and fragile. Adding TS path aliases via `tsconfig` (e.g. `@errors/AppError`) would improve readability and refactoring. Note this needs matching runtime resolution (e.g. `tsc-alias` or Node's subpath imports), since plain `tsc` doesn't rewrite path aliases in the compiled output.
+
+**Frontend still in JavaScript**
+The backend (api, worker, queue, shared, database) has been fully migrated to TypeScript, but `web/` remains plain JavaScript (`jsconfig.json`). Migrating the Vue frontend to TypeScript would extend type safety end-to-end, particularly around API response shapes shared with the backend.
+
+**Single shared `tsc` build for all backend packages**
+`npm run build` compiles `apps/api/src`, `worker`, `queue`, `shared`, and `packages/database` together via one root `tsconfig.build.json` into a single `dist/`. This is simple but means every deploy (API or worker) rebuilds code it doesn't need. Splitting into TypeScript project references, or per-package builds, would speed up CI/deploy build times as the codebase grows.
 
 **S3 key naming**
 Receipt files are stored under `uploads/{timestamp}-{filename}`. A more robust naming strategy (e.g. per-user prefixes: `receipts/{userId}/{uuid}`) would improve organization and enable per-user S3 policies.
 
 ### Roadmap (v2)
 
+- [x] TypeScript migration (backend: api, worker, queue, shared, database)
 - [ ] Full test coverage (Jest + Supertest)
-- [ ] TypeScript migration
+- [ ] TypeScript migration for the frontend (`web/`)
 - [ ] Path aliases across all packages
+- [ ] Split backend build into per-package builds / TS project references
 - [ ] Role-based access control (admin / user)
 - [ ] Email notifications on receipt approval/rejection
 - [ ] Webhook support for post-approval integrations
 - [ ] Docker Compose setup for local development
 - [ ] CI/CD pipeline (GitHub Actions)
 - [ ] Per-user S3 prefixes
-- [ ] Resolve mongoose shared instance via workspace hoisting
 
 ---
 
