@@ -3,7 +3,7 @@ import { connection } from '../../../queue/src/redis.js'
 import { Worker } from "bullmq"
 import { Receipt } from '../../../packages/database/src/models/receipt/Receipt.js'
 import { analyzeImage } from "../services/openAiService.js"
-const { getImageUrl } = require("../utils")
+import { getImageUrl } from "../utils.js";
 
 interface RawReceiptItem {
   description?: unknown
