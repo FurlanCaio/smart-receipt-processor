@@ -36,6 +36,10 @@ export const worker = new Worker("receipt-queue",
       if (!receipt) {
         return
       }
+      
+      if(!process.env.AWS_S3_BUCKET_NAME) {
+        throw new Error('AWS_S3 is not defined in environment variables');
+      }
 
       const imageUrl = await getImageUrl(process.env.AWS_S3_BUCKET_NAME, receipt.s3Key)
 
